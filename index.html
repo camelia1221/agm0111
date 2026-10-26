@@ -313,12 +313,20 @@ footer{padding:24px 20px 8px;font-size:11px;color:#9aa0a6;text-align:center}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@amplitude/analytics-browser@2.11.1/lib/scripts/amplitude-min.umd.js"></script>
 <script>
+// Amplitude (브라우저용 API 키는 공개되어도 되는 값 — 비밀 키는 절대 넣지 않기)
+const track = (name, props) => { try { window.amplitude && amplitude.track(name, props); } catch (e) {} };
+try { window.amplitude && amplitude.init("1e701dcd1fc593bce517645440af42ae", { autocapture: true }); } catch (e) {}
+
 // 주문 페이지(또는 앱 딥링크) URL — 실제 서비스 주소로 교체
 const ORDER_URL = "#order";
 document.querySelectorAll("[data-cta]").forEach(a => {
   a.href = ORDER_URL;
-  a.addEventListener("click", () => console.log("CTA click:", a.dataset.cta)); // 분석 이벤트 연결 지점
+  a.addEventListener("click", () => {
+    console.log("CTA click:", a.dataset.cta);
+    track("CTA Click", { location: a.dataset.cta });
+  });
 });
 
 // 카운트다운 (방문 시점부터 14일, 데모용)
@@ -347,6 +355,7 @@ function calc() {
   r3.textContent = won(v - d);
 }
 amt.addEventListener("input", calc); calc();
+amt.addEventListener("change", () => track("Simulator Used", { order_amount: Number(amt.value) }));
 </script>
 </body>
 </html>
